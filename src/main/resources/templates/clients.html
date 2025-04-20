@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/main}">
+<head>
+    <title layout:title="Clients">Clients</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Clients</h2>
+                    <!-- Success Message -->
+                    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                    <!-- Error Message -->
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Company Name</th>
+                            <th>Number of Projects</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="client : ${clients}">
+                            <td th:text="${client.id}"></td>
+                            <td th:text="${client.name}"></td>
+                            <td th:text="${client.companyName}"></td>
+                            <td th:text="${client.projects.size()}"></td>
+                            <td>
+                                <!-- View Projects Button -->
+                                <a th:href="@{/clients/{id}(id=${client.id})}"
+                                   class="btn btn-info btn-sm"
+                                   th:disabled="${!#authorization.expression('hasRole(''ADMIN'')')}">
+                                    Projects
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <a href="/clients/new" class="btn btn-primary"
+                       sec:authorize="hasRole('ADMIN')">New</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

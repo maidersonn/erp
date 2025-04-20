@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/main}">
+<head>
+    <title layout:title="'Project Details'">Project Details</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container mt-4">
+
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <h2 class="card-title mb-3">Project Details</h2>
+                <p><strong>Name:</strong> <span th:text="${project.name}"></span></p>
+                <p><strong>Start Date:</strong> <span th:text="${project.startDate}"></span></p>
+                <p><strong>End Date:</strong> <span th:text="${project.endDate != null ? project.endDate : '-'}"></span></p>
+                <p><strong>Client:</strong> <span th:text="${project.client.name}"></span></p>
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Assigned Employees</h4>
+                </div>
+
+                <div th:if="${project.employeeProjects.empty}">
+                    <p>No employees assigned to this project.</p>
+                </div>
+
+                <div th:if="${!project.employeeProjects.empty}">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Company Role</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Project Role</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="assignment : ${project.employeeProjects}">
+                            <td th:text="${assignment.employee.firstName + ' ' + assignment.employee.lastName}"></td>
+                            <td th:text="${assignment.employee.companyRole}"></td>
+                            <td th:text="${assignment.startDate}"></td>
+                            <td th:text="${assignment.endDate != null ? assignment.endDate : '-'}"></td>
+                            <td th:text="${assignment.projectRole}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <a href="/projects" class="btn btn-secondary mt-4">Back to Projects</a>
+
+    </div>
+
+
+</main>
+</body>
+</html>

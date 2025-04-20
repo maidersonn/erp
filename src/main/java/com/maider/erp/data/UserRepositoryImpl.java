@@ -1,5 +1,6 @@
 package com.maider.erp.data;
 
+import com.maider.erp.data.repository.JpaUserRepository;
 import com.maider.erp.domain.entities.User;
 import com.maider.erp.domain.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class UserRepositoryImplementation implements UserRepository {
+public class UserRepositoryImpl implements UserRepository {
     @Autowired
-    private UserJpaRepository jpaRepo;
+    private JpaUserRepository jpaRepo;
 
     @Override
     public User save(User user) {

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/main}">
+<head>
+    <title layout:title="'Employee Details'">Employee Details</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="container mt-4">
+        <!-- Employee Basic Info -->
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <h2 class="card-title mb-3">Employee Details</h2>
+                <p><strong>First Name:</strong> <span th:text="${employee.firstName}"></span></p>
+                <p><strong>Last Name:</strong> <span th:text="${employee.lastName}"></span></p>
+                <p><strong>DNI:</strong> <span th:text="${employee.dni}"></span></p>
+                <p><strong>Company Role:</strong> <span th:text="${employee.companyRole}"></span></p>
+            </div>
+        </div>
+
+        <!-- Assigned Projects -->
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Assigned Projects</h4>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#assignProjectModal"
+                            th:disabled="${!#authorization.expression('hasRole(''ADMIN'')')}">
+                        Assign New Project
+                    </button>
+                </div>
+
+                <div th:if="${employee.employeeProjects.empty}">
+                    <p>This employee is not assigned to any project.</p>
+                </div>
+
+                <div th:if="${!employee.employeeProjects.empty}">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Project Name</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Project Role</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="assignment : ${employee.employeeProjects}">
+                            <td th:text="${assignment.project.name}"></td>
+                            <td th:text="${assignment.startDate}"></td>
+                            <td th:text="${assignment.endDate != null ? assignment.endDate : '-'}"></td>
+                            <td th:text="${assignment.projectRole}"></td>
+                            <td>
+                                <a th:if="${assignment.endDate == null}"
+                                   th:href="@{/employees/unassign-project/{employeeId}/{projectId}(employeeId=${employee.id}, projectId=${assignment.project.id})}"
+                                   class="btn btn-danger btn-sm"
+                                   sec:authorize="hasRole('ADMIN')">
+                                    Stop Working
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <a href="/employees" class="btn btn-secondary mt-4">Back to Employees</a>
+    </div>
+    <!-- Assign Project Modal -->
+    <div class="modal fade" id="assignProjectModal" tabindex="-1" aria-labelledby="assignProjectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/employees/assign-project}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="assignProjectModalLabel">Assign Project</h5>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"
+                                th:disabled="${!#authorization.expression('hasRole(''ADMIN'')')}">
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="employeeId" th:value="${employee.id}"/>
+                        <div class="mb-3">
+                            <label for="projectId" class="form-label">Select Project</label>
+                            <select class="form-select" id="projectId" name="projectId" required>
+                                <option value="" disabled selected>Select a project</option>
+                                <option th:each="project : ${availableProjects}"
+                                        th:value="${project.id}"
+                                        th:text="${project.name}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectRole" class="form-label">Project Role</label>
+                            <input type="text" class="form-control" id="projectRole" name="projectRole" placeholder="e.g. Backend Developer" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Assign</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

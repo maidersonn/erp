@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout/main}">
+<head>
+    <title layout:title="Employees">Employees</title>
+</head>
+<body>
+<main layout:fragment="content">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-10">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">Employees</h2>
+                    <!-- Success Message -->
+                    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                    <!-- Error Message -->
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>DNI</th>
+                            <th>Company Role</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="employee : ${employees}">
+                            <td th:text="${employee.id}"></td>
+                            <td th:text="${employee.firstName + ' ' + employee.lastName}"></td>
+                            <td th:text="${employee.dni}"></td>
+                            <td th:text="${employee.companyRole}"></td>
+                            <td th:text="${employee.startDate}"></td>
+                            <td th:text="${employee.endDate != null ? employee.endDate : '-'}"></td>
+                            <td>
+                                <!-- View employee Button -->
+                                <a th:href="@{/employees/{id}(id=${employee.id})}"
+                                   class="btn btn-info btn-sm">
+                                    View
+                                </a>
+                                <!-- Terminate Button -->
+                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#terminateModal" th:data-employee-id="${employee.id}"
+                                        th:disabled="${!#authorization.expression('hasRole(''ADMIN'')')}"
+                                        th:if="${employee.endDate == null}">
+                                    Terminate
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <a href="/employees/new" class="btn btn-primary"
+                       sec:authorize="hasRole('ADMIN')">New</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminate Confirmation Modal -->
+    <div class="modal fade" id="terminateModal" tabindex="-1" aria-labelledby="terminateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="terminateModalLabel">Confirm Termination</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to terminate this employee?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a id="confirmTerminateButton" class="btn btn-danger">Terminate</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Custom JS for Terminate Modal -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const terminateModal = document.getElementById('terminateModal');
+        terminateModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const employeeId = button.getAttribute('data-employee-id');
+            const confirmTerminateButton = document.getElementById('confirmTerminateButton');
+
+            // Set the href for the confirm terminate button
+            confirmTerminateButton.href = `/employees/terminate/${employeeId}`;
+        });
+    });
+</script>
+</main>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
